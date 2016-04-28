@@ -94,44 +94,44 @@ void init()
 
 	
 
-	printf("Input run time "); 
-	scanf("%lg",&run_time); //total time for the simulation
+	printf("Input run time\n"); 
+	if(scanf("%lg",&run_time)==1){}else{printf("Failed to read.");}; //total time for the simulation
 
-  	printf("Input grid size theta ");
-    scanf("%ld",&num_of_meshpoint_theta);
+  	printf("Input grid size theta\n");
+	if(scanf("%ld",&num_of_meshpoint_theta)==1){}else{printf("Failed to read.");};
     
-    printf("Input grid size phi (only half of them) ");
-    scanf("%ld",&num_of_meshpoint_phi);
+	printf("Input grid size phi (only half of them)\n");
+   	if(scanf("%ld",&num_of_meshpoint_phi)==1){}else{printf("Failed to read.");};
     
     
-    printf("Input iterations ");
-  	scanf("%ld",&num_of_iteration);
+    	printf("Input iterations\n");
+  	if(scanf("%ld",&num_of_iteration)==1){}else{printf("Failed to read.");};
     
-    dtheta= PI/num_of_meshpoint_theta;
-    dphi=PI/(num_of_meshpoint_phi);
+    	dtheta= PI/num_of_meshpoint_theta;
+    	dphi=PI/(num_of_meshpoint_phi);
     
-    DT = run_time/num_of_iteration;
+    	DT = run_time/num_of_iteration;
 
-	printf("Choose integration method "); 
+	printf("Choose integration method\n"); 
   	printf("\n");
   	printf("\n\t1. Euler");
   	printf("\n\t2. Runge-Kutta (2 steps)");
   	printf("\n\t3. Runge-Kutta (4 steps)");
   	printf("\n\n");
   	printf("Input flag ");
-  	scanf("%ld",&method);
+  	if(scanf("%ld",&method)==1){}else{printf("Failed to read.");};
   
-	printf("Input sigma "); 
-  	scanf("%lg",&sigma);
+	printf("Input sigma\n"); 
+  	if(scanf("%lg",&sigma)==1){}else{printf("Failed to read.");};
 
-	printf("Choose intial configuration "); 
+	printf("Choose intial configuration\n"); 
   	printf("\n");
   	printf("\n\t1. Random");
 	printf("\n\t2. Import");
 	printf("\n\t3. Debug");
   	printf("\n\n");
-  	printf("Input flag ");
-  	scanf("%ld",&cflag);
+  	printf("Input flag\n");
+  	if(scanf("%ld",&cflag)==1){}else{printf("Failed to read.");};
 
   	switch(cflag){
   	case 1:
@@ -173,29 +173,6 @@ void allocate_memory()
         phi[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
 	}
 	
-/*	k0 = (double ***) malloc(4*num_of_meshpoint_theta*sizeof(double));
-//	k1 = (double ***) malloc(4*num_of_meshpoint_theta*sizeof(double));
-	k2 = (double ***) malloc(4*num_of_meshpoint_theta*sizeof(double));
-	k3 = (double ***) malloc(4*num_of_meshpoint_theta*sizeof(double));
-	k4 = (double ***) malloc(4*num_of_meshpoint_theta*sizeof(double));
-	
-	for (i=0; i<4; i++){
-	//	k0[i] = (double **) malloc(num_of_meshpoint_theta*2*num_of_meshpoint_phi*sizeof(double));
-	//	k1[i] = (double **) malloc(num_of_meshpoint_theta*2*num_of_meshpoint_phi*sizeof(double));
-		k2[i] = (double **) malloc(num_of_meshpoint_theta*2*num_of_meshpoint_phi*sizeof(double));
-		k3[i] = (double **) malloc(num_of_meshpoint_theta*2*num_of_meshpoint_phi*sizeof(double));
-		k4[i] = (double **) malloc(num_of_meshpoint_theta*2*num_of_meshpoint_phi*sizeof(double));
-	}
-	
-	for (i=0; i<4; i++){
-		for (j=1; j<=num_of_meshpoint_theta-1; j++){
-		//	k0[i][j] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-			k1[i][j] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-			k2[i][j] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-			k3[i][j] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-			k4[i][j] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-		}
-	}*/
 }
 
 /*******************************************************************/
@@ -205,20 +182,21 @@ void init_random()
 	double ns=0.1, area;
 	long i, j;
 	
-	printf("Input area percentage ");
-	scanf("%lg",&area);
+	printf("Input area percentage\n");
+	if(scanf("%lg",&area)==1){}else{printf("Failed to read.");};
 	
-	printf("Input random seed ");
-    scanf("%ld",&seed);
+	printf("Input random seed\n ");
+    	if(scanf("%ld",&seed)==1){}else{printf("Failed to read.");};
 
 	allocate_memory();
 	
 	for (i=1; i<=num_of_meshpoint_theta-1; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			phi[i][j] = (2*area-1)+ns*(1-2*ran2(&seed));
-            //printf("Valori seed (%ld,%ld) %f\n",i,j,phi[i][j]);
+           		//printf("Valori seed (%ld,%ld) %f\n",i,j,phi[i][j]);
 		}
 	}
+	printf("\n");
 }
 
 /******************************************************************/
@@ -241,7 +219,7 @@ void get_chemical()
     for (i=1; i<=num_of_meshpoint_theta-1; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			u = phi[i][j]*(phi[i][j]*phi[i][j]-1)/(epsilon*epsilon);
-            //printf("Derivata (%ld,%ld) %f\n",i,j,DXX(phi,i,j));
+            		//printf("Derivata (%ld,%ld) %f\n",i,j,DXX(phi,i,j));
 			mu[i][j] = sigma*(u-DD(phi,i,j));
 			lagrange += u/num_of_gridpoint;
 		}
@@ -254,17 +232,17 @@ void get_rhs(double **rhs)
 {
 	long i, j;
 	
-    //printf("provabeforegetc\n");
+    	//printf("provabeforegetc\n");
     
 	get_chemical();
 
-    printf("provaafteregetc\n");
+    	//printf("provaafteregetc\n");
 
     
 	for (i=1; i<=num_of_meshpoint_theta-1; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-            printf("(%ld, %ld)\n",i,j);
-            rhs[i][j] = lagrange-mu[i][j];
+            		//printf("(%ld, %ld)\n",i,j);
+            		rhs[i][j] = lagrange-mu[i][j];
 		}
 	}
 }
@@ -283,7 +261,6 @@ void run()
 		export_conf(t,export);
 		write_hi(f_hi,t);
 		progress_bar(t);
-        //printf("prova_run\n");
 		one_step();
 	}
 
@@ -403,7 +380,7 @@ double DXX(double **f, long i, long j)
         next_i = i+1;
         next_j = j;}
     
-    printf("Current (%ld,%ld),Next (%ld,%ld),Prev (%ld,%ld)\n",i,j,next_i,next_j,prev_i,prev_j);
+    //printf("Current (%ld,%ld),Next (%ld,%ld),Prev (%ld,%ld)\n",i,j,next_i,next_j,prev_i,prev_j);
 	
 	return (f[next_i][next_j]-2*f[i][j]+f[prev_i][prev_j])/(dtheta*dtheta);
 }
@@ -440,7 +417,7 @@ double DYY(double **f, long i, long j)
 void one_step()
 {
     
-    printf("provaonestep\n");
+    	//printf("provaonestep\n");
     
 	switch(method){
   	case 1:
@@ -450,7 +427,7 @@ void one_step()
 		rk2();
     	break;
   	case 3:
-        rk4();
+        	rk4();
     	break;
 	}
 }
@@ -504,7 +481,7 @@ void rk2()
 /*******************************************************************/
 
 void rk4()
-{  printf("provark4");
+{  	
 	double h=DT/6;
 	long i, j;
 	
