@@ -1,0 +1,24 @@
+#!/bin/bash
+
+rm spheredp
+gcc  -o spheredp spheredp.c -O3 -lm
+./spheredp << EOF
+4
+10
+5
+4
+1
+1
+1
+0.5
+1234
+EOF
+
+
+
+
+
+
+
+
+
