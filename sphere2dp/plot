@@ -45,8 +45,8 @@ command_line="'tmp.dat' us 1:2:3 notitle"
 
 gnuplot <<EOF
 set size square
-set xrange [0:$box_size]
-set yrange [0:$box_size]
+#set xrange [0:$box_size]
+#set yrange [0:$box_size]
 set pm3d map
 set palette gray
 #set palette defined (-1 "red", 0 "white", 1 "green")
@@ -63,6 +63,6 @@ done
 
 rm -f tmp*.dat
 
-ffmpeg -r 7 -i %04d.png -sameq video.avi
+avconv -r 7 -i %04d.png video.avi
 
 rm -f *.png
