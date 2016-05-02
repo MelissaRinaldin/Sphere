@@ -219,9 +219,9 @@ void get_chemical()
     for (i=1; i<=num_of_meshpoint_theta-1; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			u = phi[i][j]*(phi[i][j]*phi[i][j]-1)/(epsilon*epsilon);
-            		//printf("Derivata (%ld,%ld) %f\n",i,j,DXX(phi,i,j));
 			mu[i][j] = sigma*(u-DD(phi,i,j));
 			lagrange += u/num_of_gridpoint;
+            		printf("(%2ld,%2ld) u: %12G Lagrange: %12G mu: %12G DD: %12G DXX: %12G DX: %12G DYY: %12G\n",i,j,u,lagrange,mu[i][j],DD(phi,i,j),DXX(phi,i,j),DX(phi,i,j),DYY(phi,i,j));
 		}
 	}
 }
@@ -232,13 +232,8 @@ void get_rhs(double **rhs)
 {
 	long i, j;
 	
-    	//printf("provabeforegetc\n");
-    
 	get_chemical();
 
-    	//printf("provaafteregetc\n");
-
-    
 	for (i=1; i<=num_of_meshpoint_theta-1; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
             		//printf("(%ld, %ld)\n",i,j);
@@ -305,7 +300,7 @@ void run()
 
 double DD(double **f, long i, long j)
 {	
-	return DXX(f,i,j)+ 1/tan(i*dtheta)*DX(f,i,j)+1/(sin(i*dtheta)*sin(i*dtheta))*DYY(f,i,j); // since tan(0)=tan(pi)=0 the for loops have to start from i=1 and stop in i=num_of_meshpoint_theta-1
+	return DXX(f,i,j)+ 1/tan((i+1/2)*dtheta)*DX(f,i,j)+1/(sin((i+1/2)*dtheta)*sin((i+1/2)*dtheta))*DYY(f,i,j); // since tan(0)=tan(pi)=0 the for loops have to start from i=1 and stop in i=num_of_meshpoint_theta-1
 }
 
 /*******************************************************************/
@@ -620,7 +615,7 @@ void export_conf(long t, long period)
 	
 	for (i=1; i<=num_of_meshpoint_theta-1; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			x = i*dtheta;
+			x = (i+1/2)*dtheta;
 			y = j*dphi;
 			fprintf(f_ou,"%.10f\t%.10f\t%.10f\n",x,y,phi[i][j]);
 		}
@@ -713,7 +708,7 @@ void debug()
 	f_ou = fopen("debug-phi.dat","w");
 	for (i=1; i<=num_of_meshpoint_theta-1; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			x = i*dtheta;
+			x = (i+1/2)*dtheta;
 			y = j*dphi;
 			fprintf(f_ou,"%g %g %g\n",x,y,phi[i][j]);
 		}
@@ -725,7 +720,7 @@ void debug()
 	f_ou = fopen("debug-rhs1.dat","w");
 	for (i=1; i<=num_of_meshpoint_theta-1; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			x = i*dtheta;
+			x = (i+1/2)*dtheta;
 			y = j*dphi;
 			fprintf(f_ou,"%g %g %g\n",x,y,k0[i][j]);
 		}

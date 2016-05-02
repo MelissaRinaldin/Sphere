@@ -1,13 +1,14 @@
 #!/bin/bash
 
 rm spheredp
+rm *.dat
 gcc  -o spheredp spheredp.c -O3 -lm
 ./spheredp << EOF
 4
-10
-5
-4
 3
+2	
+4
+1
 1
 1
 0.5
