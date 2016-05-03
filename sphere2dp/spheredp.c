@@ -43,7 +43,7 @@ double dtheta;
 double dphi;
 double DT;
 
-//double get_area();
+double get_area();
 double ran2(long *);
 
 double DD(double **, long, long);
@@ -94,44 +94,44 @@ void init()
 
 	
 
-	printf("Input run time "); 
-	scanf("%lg",&run_time); //total time for the simulation
+	printf("Input run time\n"); 
+	if(scanf("%lg",&run_time)==1){}else{printf("Failed to read.");}; //total time for the simulation
 
-  	printf("Input grid size theta ");
-    scanf("%ld",&num_of_meshpoint_theta);
+  	printf("Input grid size theta\n");
+	if(scanf("%ld",&num_of_meshpoint_theta)==1){}else{printf("Failed to read.");};
     
-    printf("Input grid size phi (only half of them) ");
-    scanf("%ld",&num_of_meshpoint_phi);
+	printf("Input grid size phi (only half of them)\n");
+   	if(scanf("%ld",&num_of_meshpoint_phi)==1){}else{printf("Failed to read.");};
     
     
-    printf("Input iterations ");
-  	scanf("%ld",&num_of_iteration);
+    	printf("Input iterations\n");
+  	if(scanf("%ld",&num_of_iteration)==1){}else{printf("Failed to read.");};
     
-    dtheta= PI/num_of_meshpoint_theta;
-    dphi=PI/(num_of_meshpoint_phi);
+    	dtheta= PI/num_of_meshpoint_theta;
+    	dphi=PI/(num_of_meshpoint_phi);
     
-    DT = run_time/num_of_iteration;
+    	DT = run_time/num_of_iteration;
 
-	printf("Choose integration method "); 
+	printf("Choose integration method\n"); 
   	printf("\n");
   	printf("\n\t1. Euler");
   	printf("\n\t2. Runge-Kutta (2 steps)");
   	printf("\n\t3. Runge-Kutta (4 steps)");
   	printf("\n\n");
   	printf("Input flag ");
-  	scanf("%ld",&method);
+  	if(scanf("%ld",&method)==1){}else{printf("Failed to read.");};
   
-	printf("Input sigma "); 
-  	scanf("%lg",&sigma);
+	printf("Input sigma\n"); 
+  	if(scanf("%lg",&sigma)==1){}else{printf("Failed to read.");};
 
-	printf("Choose intial configuration "); 
+	printf("Choose intial configuration\n"); 
   	printf("\n");
   	printf("\n\t1. Random");
 	printf("\n\t2. Import");
 	printf("\n\t3. Debug");
   	printf("\n\n");
-  	printf("Input flag ");
-  	scanf("%ld",&cflag);
+  	printf("Input flag\n");
+  	if(scanf("%ld",&cflag)==1){}else{printf("Failed to read.");};
 
   	switch(cflag){
   	case 1:
@@ -162,7 +162,7 @@ void allocate_memory()
 	phi = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
 	energy = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
         mu[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
         k0[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
         k1[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
@@ -173,29 +173,6 @@ void allocate_memory()
         phi[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
 	}
 	
-/*	k0 = (double ***) malloc(4*num_of_meshpoint_theta*sizeof(double));
-//	k1 = (double ***) malloc(4*num_of_meshpoint_theta*sizeof(double));
-	k2 = (double ***) malloc(4*num_of_meshpoint_theta*sizeof(double));
-	k3 = (double ***) malloc(4*num_of_meshpoint_theta*sizeof(double));
-	k4 = (double ***) malloc(4*num_of_meshpoint_theta*sizeof(double));
-	
-	for (i=0; i<4; i++){
-	//	k0[i] = (double **) malloc(num_of_meshpoint_theta*2*num_of_meshpoint_phi*sizeof(double));
-	//	k1[i] = (double **) malloc(num_of_meshpoint_theta*2*num_of_meshpoint_phi*sizeof(double));
-		k2[i] = (double **) malloc(num_of_meshpoint_theta*2*num_of_meshpoint_phi*sizeof(double));
-		k3[i] = (double **) malloc(num_of_meshpoint_theta*2*num_of_meshpoint_phi*sizeof(double));
-		k4[i] = (double **) malloc(num_of_meshpoint_theta*2*num_of_meshpoint_phi*sizeof(double));
-	}
-	
-	for (i=0; i<4; i++){
-		for (j=1; j<=num_of_meshpoint_theta-1; j++){
-		//	k0[i][j] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-			k1[i][j] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-			k2[i][j] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-			k3[i][j] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-			k4[i][j] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-		}
-	}*/
 }
 
 /*******************************************************************/
@@ -205,20 +182,21 @@ void init_random()
 	double ns=0.1, area;
 	long i, j;
 	
-	printf("Input area percentage ");
-	scanf("%lg",&area);
+	printf("Input area percentage\n");
+	if(scanf("%lg",&area)==1){}else{printf("Failed to read.");};
 	
-	printf("Input random seed ");
-    scanf("%ld",&seed);
+	printf("Input random seed\n ");
+    	if(scanf("%ld",&seed)==1){}else{printf("Failed to read.");};
 
 	allocate_memory();
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			phi[i][j] = (2*area-1)+ns*(1-2*ran2(&seed));
-            //printf("Valori seed (%ld,%ld) %f\n",i,j,phi[i][j]);
+           		//printf("Valori seed (%ld,%ld) %f\n",i,j,phi[i][j]);
 		}
 	}
+	printf("\n");
 }
 
 /******************************************************************/
@@ -233,17 +211,17 @@ void init_import()
 
 void get_chemical()
 {
-	long i, j, num_of_gridpoint=2*(num_of_meshpoint_theta-1)*num_of_meshpoint_phi;
+	long i, j, num_of_gridpoint=2*(num_of_meshpoint_theta)*num_of_meshpoint_phi;
 	double u;
 		
 	lagrange = 0;
     
-    for (i=1; i<=num_of_meshpoint_theta-1; i++){
+    for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			u = phi[i][j]*(phi[i][j]*phi[i][j]-1)/(epsilon*epsilon);
-            //printf("Derivata (%ld,%ld) %f\n",i,j,DXX(phi,i,j));
 			mu[i][j] = sigma*(u-DD(phi,i,j));
-			lagrange += u/num_of_gridpoint;
+			lagrange += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*u;
+            		//printf("(%2ld,%2ld) u: %12G phi: %12G Lagrange: %12G mu: %12G DD: %12G DXX: %12G DX: %12G DYY: %12G\n",i,j,u,phi[i][j],lagrange,mu[i][j],DD(phi,i,j),DXX(phi,i,j),DX(phi,i,j),DYY(phi,i,j));
 		}
 	}
 }
@@ -254,17 +232,12 @@ void get_rhs(double **rhs)
 {
 	long i, j;
 	
-    //printf("provabeforegetc\n");
-    
 	get_chemical();
 
-    printf("provaafteregetc\n");
-
-    
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-            printf("(%ld, %ld)\n",i,j);
-            rhs[i][j] = lagrange-mu[i][j];
+            		rhs[i][j] = lagrange-mu[i][j];
+            		//printf("(%ld, %ld) rhs: %12G\n",i,j,rhs[i][j]);
 		}
 	}
 }
@@ -283,14 +256,12 @@ void run()
 		export_conf(t,export);
 		write_hi(f_hi,t);
 		progress_bar(t);
-        //printf("prova_run\n");
 		one_step();
 	}
 
 	fclose(f_hi);
 }
 
-/******************************************************************
  
  
  double get_area()
@@ -298,9 +269,10 @@ void run()
 	double area=0;
 	long i, j;
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			area += 0.5*DS*DS*(phi[i][j]+1);
+			area += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*(phi[i][j]+1)*.5;
+			//area += .5*dtheta*dphi*sin((i-.5)*dtheta)*(phi[i][j]+1);
 		}
 	}
 	return area;
@@ -328,7 +300,8 @@ void run()
 
 double DD(double **f, long i, long j)
 {	
-	return DXX(f,i,j)+ 1/tan(i*dtheta)*DX(f,i,j)+1/(sin(i*dtheta)*sin(i*dtheta))*DYY(f,i,j); // since tan(0)=tan(pi)=0 the for loops have to start from i=1 and stop in i=num_of_meshpoint_theta-1
+	return DXX(f,i,j)+ 1/tan((i-.5)*dtheta)*DX(f,i,j);+1/(sin((i-.5)*dtheta)*sin((i-.5)*dtheta))*DYY(f,i,j); 
+	// since tan(0)=tan(pi)=0 the for loops have to start from i=1 and stop in i=num_of_meshpoint_theta
 }
 
 /*******************************************************************/
@@ -349,8 +322,8 @@ double DX(double **f, long i, long j)
     }
     
     
-    if (i==num_of_meshpoint_theta-1) {
-        next_i = num_of_meshpoint_theta-1;
+    if (i==num_of_meshpoint_theta) {
+        next_i = num_of_meshpoint_theta;
         if(j<num_of_meshpoint_phi){next_j=j+num_of_meshpoint_phi;}else{next_j=j-num_of_meshpoint_phi;};
     }
     
@@ -393,8 +366,8 @@ double DXX(double **f, long i, long j)
     }
     
     
-    if (i==num_of_meshpoint_theta-1) {
-        next_i = num_of_meshpoint_theta-1;
+    if (i==num_of_meshpoint_theta) {
+        next_i = num_of_meshpoint_theta;
         if(j<num_of_meshpoint_phi){next_j=j+num_of_meshpoint_phi;}else{next_j=j-num_of_meshpoint_phi;};
     }
     
@@ -403,7 +376,7 @@ double DXX(double **f, long i, long j)
         next_i = i+1;
         next_j = j;}
     
-    printf("Current (%ld,%ld),Next (%ld,%ld),Prev (%ld,%ld)\n",i,j,next_i,next_j,prev_i,prev_j);
+    //printf("Current (%ld,%ld),Next (%ld,%ld),Prev (%ld,%ld)\n",i,j,next_i,next_j,prev_i,prev_j);
 	
 	return (f[next_i][next_j]-2*f[i][j]+f[prev_i][prev_j])/(dtheta*dtheta);
 }
@@ -440,7 +413,7 @@ double DYY(double **f, long i, long j)
 void one_step()
 {
     
-    printf("provaonestep\n");
+    	//printf("provaonestep\n");
     
 	switch(method){
   	case 1:
@@ -450,7 +423,7 @@ void one_step()
 		rk2();
     	break;
   	case 3:
-        rk4();
+        	rk4();
     	break;
 	}
 }
@@ -464,9 +437,10 @@ void euler()
 	
 	get_rhs(k0);
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			phi[i][j] += h*k0[i][j];
+			//printf("(%2ld,%2ld) (Euler) Phi: %12G\n",i,j,phi[i][j]);
 		}
 	}
 }
@@ -478,7 +452,7 @@ void rk2()
 	double h=DT/2;
 	long i, j;
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			k0[i][j] = phi[i][j];
 		}
@@ -486,7 +460,7 @@ void rk2()
 	
 	get_rhs(k1);
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			phi[i][j] = k0[i][j]+DT*k1[i][j];
 		}
@@ -494,7 +468,7 @@ void rk2()
 	
 	get_rhs(k2);
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			phi[i][j] = k0[i][j]+h*(k1[i][j]+k2[i][j]);
 		}
@@ -504,11 +478,11 @@ void rk2()
 /*******************************************************************/
 
 void rk4()
-{  printf("provark4");
+{  	
 	double h=DT/6;
 	long i, j;
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			k0[i][j] = phi[i][j];
 		}
@@ -516,7 +490,7 @@ void rk4()
 	
 	get_rhs(k1);
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			phi[i][j] = k0[i][j]+0.5*DT*k1[i][j];
 		}
@@ -524,7 +498,7 @@ void rk4()
 	
 	get_rhs(k2);
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			phi[i][j] = k0[i][j]+0.5*DT*k2[i][j];
 		}
@@ -532,7 +506,7 @@ void rk4()
 	
 	get_rhs(k3);
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			phi[i][j] = k0[i][j]+DT*k3[i][j];
 		}
@@ -540,7 +514,7 @@ void rk4()
 	
 	get_rhs(k4);
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			phi[i][j] = k0[i][j]+h*(k1[i][j]+2*k2[i][j]+2*k3[i][j]+k4[i][j]);
 		}
@@ -584,7 +558,7 @@ void end()
 	printf("\tGrid spacing in theta %g and in phi %g\n",dtheta,dphi);
 	printf("\tTime step %g\n",DT);
 	printf("\tSigma %g\n",sigma);
-	//printf("\tArea %g\n",get_area());
+	printf("\tArea %g\n",get_area());
 	printf("\tCPU Time %ld:%ld:%ld:%ld\n",
 	 cpu_time.d,cpu_time.h,
 	 cpu_time.m,cpu_time.s);
@@ -593,7 +567,7 @@ void end()
 	f_ou = fopen("ou.dat","w");	
 	fprintf(f_ou,"Time step %g\n",DT);
 	fprintf(f_ou,"Sigma %g\n",sigma);
-	//fprintf(f_ou,"Area %.10f\n",get_area());
+	fprintf(f_ou,"Area %.10f\n",get_area());
 	fprintf(f_ou,"CPU Time %ld:%ld:%ld:%ld\n",
 	 cpu_time.d,cpu_time.h,
 	 cpu_time.m,cpu_time.s);
@@ -608,15 +582,15 @@ void write_hi(FILE *f_ou, long t)
 	double phi_tot=0;
 	long m, i, j;
  	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			phi_tot += phi[i][j];
+			phi_tot += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*phi[i][j];
 		}
 	}
 	
-	m = num_of_meshpoint_theta/2;
+	//m = num_of_meshpoint_theta/2;
 	
-	fprintf(f_ou,"%.10f\t%.10f\t%.10f\n",t*DT,phi[m][m],phi_tot);
+	fprintf(f_ou,"%.10f\t%.10f\n",t*DT,phi_tot);
 	
 	// Legend
 	
@@ -641,9 +615,9 @@ void export_conf(long t, long period)
 	
 	f_ou = fopen(f_na,"w");
 	
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			x = i*dtheta;
+			x = (i-.5)*dtheta;
 			y = j*dphi;
 			fprintf(f_ou,"%.10f\t%.10f\t%.10f\n",x,y,phi[i][j]);
 		}
@@ -734,9 +708,9 @@ void debug()
 	exit(0);
 	
 	f_ou = fopen("debug-phi.dat","w");
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			x = i*dtheta;
+			x = (i+1/2)*dtheta;
 			y = j*dphi;
 			fprintf(f_ou,"%g %g %g\n",x,y,phi[i][j]);
 		}
@@ -746,9 +720,9 @@ void debug()
 	get_rhs(k0);
 
 	f_ou = fopen("debug-rhs1.dat","w");
-	for (i=1; i<=num_of_meshpoint_theta-1; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			x = i*dtheta;
+			x = (i+1/2)*dtheta;
 			y = j*dphi;
 			fprintf(f_ou,"%g %g %g\n",x,y,k0[i][j]);
 		}
