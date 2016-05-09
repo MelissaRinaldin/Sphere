@@ -70,6 +70,7 @@ void progress_bar(long);
 void get_rhs(double **);
 void write_hi(FILE *, long);
 void export_conf(long, long);
+void export_coord();
 void get_time(time_t, CPU_Time *);
 
 /*******************************************************************/
@@ -178,7 +179,7 @@ void allocate_memory()
 
 void init_random()
 {
-	double ns=0.1, area;
+	double ns=0.5, area;
 	long i, j;
 	
 	printf("Input area percentage\n");
@@ -217,9 +218,10 @@ void get_chemical()
 	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			u = phi[i][j]*(phi[i][j]*phi[i][j]-1)/(epsilon*epsilon);
-			//mu[i][j] = sigma*(u-DD(phi,i,j));
 			mu[i][j] = sigma*(u-DD(phi,i,j));
-			lagrange += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*u;
+			lagrange += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*(u-DD(phi,i,j));
+			//mu[i][j] = sigma*(-DD(phi,i,j));
+			//lagrange += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*(-DD(phi,i,j));
 			//printf("(%2ld,%2ld) u: %12G phi: %12G Lagrange: %12G mu: %12G DD: %12G DXX: %12G DX: %12G DYY: %12G\n",i,j,u,phi[i][j],lagrange,mu[i][j],DD(phi,i,j),DXX(phi,i,j),DX(phi,i,j),DYY(phi,i,j));
 		}
 	}
@@ -249,7 +251,9 @@ void run()
 	
 	FILE *f_hi, *f_st;
 	
-	f_hi = fopen("hi.dat","w");	
+	f_hi = fopen("hi.dat","w");
+
+	export_coord();	
 	
 	for (t=0; t<num_of_iteration; t++){
 		export_conf(t,export);
@@ -299,7 +303,9 @@ void run()
 
 double DD(double **f, long i, long j)
 {	
-	return DXX(f,i,j)+ 1/tan((i-.5)*dtheta)*DX(f,i,j)+1/(sin((i-.5)*dtheta)*sin((i-.5)*dtheta))*DYY(f,i,j); 
+	//printf("(%2ld,%2ld) Coeff DX: %12G Coeff DYY: %12G\n",i,j,1/tan((i-.5)*dtheta)*DX(f,i,j),1/(sin((i-.5)*dtheta)*sin((i-.5)*dtheta))*DYY(f,i,j));
+	return DXX(f,i,j)+1/tan((i-.5)*dtheta)*DX(f,i,j)+1/(sin((i-.5)*dtheta)*sin((i-.5)*dtheta))*DYY(f,i,j); 
+	//return DXX(f,i,j)+1/tan((i-.5)*dtheta)*DX(f,i,j)+1/(sin((i-.5)*dtheta)*sin((i-.5)*dtheta))*DYY(f,i,j); 
 	// since tan(0)=tan(pi)=0 the for loops have to start from i=1 and stop in i=num_of_meshpoint_theta
 }
 
@@ -386,9 +392,11 @@ double DYY(double **f, long i, long j)
 {
 	long prev, next;
 	
-	prev = mod(j-1,2*num_of_meshpoint_phi);
-	next = mod(j+1,2*num_of_meshpoint_phi);
-	
+	//prev = mod(j-1,2*num_of_meshpoint_phi);
+	//next = mod(j+1,2*num_of_meshpoint_phi);
+	if(j==1) {prev=2*num_of_meshpoint_phi;} else{prev= j-1;};
+	if(j==2*num_of_meshpoint_phi) {next=1;} else{next= j+1;};
+
 	return (f[i][next]-2*f[i][j]+f[i][prev])/(dphi*dphi);
 }
 
@@ -578,8 +586,8 @@ void end()
 
 void write_hi(FILE *f_ou, long t)
 {
-	double phi_tot=0;
-	long m, i, j;
+	double phi_tot=0,utemp,ddtemp;
+	long m, i, j, it, jt,it1;
  	
 	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
@@ -588,8 +596,15 @@ void write_hi(FILE *f_ou, long t)
 	}
 	
 	//m = num_of_meshpoint_theta/2;
+
+	it=num_of_meshpoint_theta;
+	it1=(int)it*.5;
+	jt=num_of_meshpoint_phi;
+
+	utemp=phi[it][jt]*(phi[it][jt]*phi[it][jt]-1)/(epsilon*epsilon);
+	ddtemp=DD(phi,it,jt);
 	
-	fprintf(f_ou,"%.10f\t%.10f\t%.10f\n",t*DT,phi_tot,DD(phi,num_of_meshpoint_theta,num_of_meshpoint_phi));
+	fprintf(f_ou,"%.10f\t%.10f\t%.10f\t%.10f\t%.10f\t%.10f\n",t*DT,phi_tot,ddtemp,utemp,phi[it][jt],phi[it1][jt]);
 	
 	// Legend
 	
@@ -599,6 +614,27 @@ void write_hi(FILE *f_ou, long t)
 }
 
 /*******************************************************************/
+
+void export_coord()
+{
+	char f_na[32];
+	double x, y;
+	long i, j;
+
+	FILE *f_ou;
+
+	sprintf(f_na,"coord.dat");
+	f_ou = fopen(f_na,"w");
+	
+	for (i=1; i<=num_of_meshpoint_theta; i++){
+		for (j=1; j<=2*num_of_meshpoint_phi; j++){
+			x = (i-.5)*dtheta;
+			y = j*dphi;
+			fprintf(f_ou,"%.10f\t%.10f\n",x,y);
+		}
+	}
+	fclose(f_ou);
+}
 
 void export_conf(long t, long period)
 {
@@ -616,9 +652,9 @@ void export_conf(long t, long period)
 	
 	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			x = (i-.5)*dtheta;
-			y = j*dphi;
-			fprintf(f_ou,"%.10f\t%.10f\t%.10f\n",x,y,phi[i][j]);
+			//x = (i-.5)*dtheta;
+			//y = j*dphi;
+			fprintf(f_ou,"%.10f\n",phi[i][j]);
 		}
 	}
 	fclose(f_ou);
