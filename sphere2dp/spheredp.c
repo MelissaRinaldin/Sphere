@@ -1,10 +1,10 @@
 /******************************************************************
-**                                                               **
-**                           SPHERE  DP                          **
-**                                                               **
-** Program for sphere (April 2016) with double pointers 
- (instead of triple pointers)                                    **
-**                                                               **
+**								 **
+**				   SPHERE  DP			 **
+**								 **
+** 	Program for sphere (April 2016) with double pointers 	 **
+**	(instead of triple pointers)				 **
+**								 **
 *******************************************************************/
 
 /* x=theta (0:PI) and y= phi (0:2PI)  */
@@ -70,6 +70,7 @@ void progress_bar(long);
 void get_rhs(double **);
 void write_hi(FILE *, long);
 void export_conf(long, long);
+void export_coord();
 void get_time(time_t, CPU_Time *);
 
 /*******************************************************************/
@@ -135,8 +136,8 @@ void init()
 
   	switch(cflag){
   	case 1:
-	    init_random();
-	    break;
+		init_random();
+		break;
   	case 2:
 		init_import();
 		break;
@@ -152,25 +153,24 @@ void allocate_memory()
 {
 	long i, j;
 	
-    mu = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
-    k0 = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
-    k1 = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
-    k2 = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
-    k3 = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
-    k4 = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
+	mu = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
+	k0 = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
+	k1 = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
+	k2 = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
+	k3 = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
+	k4 = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
 
 	phi = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
 	energy = (double **) malloc(num_of_meshpoint_theta*sizeof(double));
 	
 	for (i=1; i<=num_of_meshpoint_theta; i++){
-        mu[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-        k0[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-        k1[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-        k2[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-        k3[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-        k4[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
-
-        phi[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
+	  mu[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
+	  k0[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
+	  k1[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
+	  k2[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
+	  k3[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
+	  k4[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
+	  phi[i] = (double *) malloc(2*num_of_meshpoint_phi*sizeof(double));
 	}
 	
 }
@@ -179,7 +179,7 @@ void allocate_memory()
 
 void init_random()
 {
-	double ns=0.1, area;
+	double ns=0.5, area;
 	long i, j;
 	
 	printf("Input area percentage\n");
@@ -193,7 +193,6 @@ void init_random()
 	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			phi[i][j] = (2*area-1)+ns*(1-2*ran2(&seed));
-           		//printf("Valori seed (%ld,%ld) %f\n",i,j,phi[i][j]);
 		}
 	}
 	printf("\n");
@@ -216,12 +215,14 @@ void get_chemical()
 		
 	lagrange = 0;
     
-    for (i=1; i<=num_of_meshpoint_theta; i++){
+	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			u = phi[i][j]*(phi[i][j]*phi[i][j]-1)/(epsilon*epsilon);
 			mu[i][j] = sigma*(u-DD(phi,i,j));
-			lagrange += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*u;
-            		//printf("(%2ld,%2ld) u: %12G phi: %12G Lagrange: %12G mu: %12G DD: %12G DXX: %12G DX: %12G DYY: %12G\n",i,j,u,phi[i][j],lagrange,mu[i][j],DD(phi,i,j),DXX(phi,i,j),DX(phi,i,j),DYY(phi,i,j));
+			lagrange += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*(u-DD(phi,i,j));
+			//mu[i][j] = sigma*(-DD(phi,i,j));
+			//lagrange += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*(-DD(phi,i,j));
+			//printf("(%2ld,%2ld) u: %12G phi: %12G Lagrange: %12G mu: %12G DD: %12G DXX: %12G DX: %12G DYY: %12G\n",i,j,u,phi[i][j],lagrange,mu[i][j],DD(phi,i,j),DXX(phi,i,j),DX(phi,i,j),DYY(phi,i,j));
 		}
 	}
 }
@@ -236,8 +237,8 @@ void get_rhs(double **rhs)
 
 	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-            		rhs[i][j] = lagrange-mu[i][j];
-            		//printf("(%ld, %ld) rhs: %12G\n",i,j,rhs[i][j]);
+				rhs[i][j] = lagrange-mu[i][j];
+				//printf("(%ld, %ld) rhs: %12G\n",i,j,rhs[i][j]);
 		}
 	}
 }
@@ -250,7 +251,9 @@ void run()
 	
 	FILE *f_hi, *f_st;
 	
-	f_hi = fopen("hi.dat","w");	
+	f_hi = fopen("hi.dat","w");
+
+	export_coord();	
 	
 	for (t=0; t<num_of_iteration; t++){
 		export_conf(t,export);
@@ -296,11 +299,13 @@ void run()
 
 /*******************************************************************/
 
-//Laplace operator on a spehere
+//Laplace operator on a sphere
 
 double DD(double **f, long i, long j)
 {	
-	return DXX(f,i,j)+ 1/tan((i-.5)*dtheta)*DX(f,i,j);+1/(sin((i-.5)*dtheta)*sin((i-.5)*dtheta))*DYY(f,i,j); 
+	//printf("(%2ld,%2ld) Coeff DX: %12G Coeff DYY: %12G\n",i,j,1/tan((i-.5)*dtheta)*DX(f,i,j),1/(sin((i-.5)*dtheta)*sin((i-.5)*dtheta))*DYY(f,i,j));
+	return DXX(f,i,j)+1/tan((i-.5)*dtheta)*DX(f,i,j)+1/(sin((i-.5)*dtheta)*sin((i-.5)*dtheta))*DYY(f,i,j); 
+	//return DXX(f,i,j)+1/tan((i-.5)*dtheta)*DX(f,i,j)+1/(sin((i-.5)*dtheta)*sin((i-.5)*dtheta))*DYY(f,i,j); 
 	// since tan(0)=tan(pi)=0 the for loops have to start from i=1 and stop in i=num_of_meshpoint_theta
 }
 
@@ -312,25 +317,25 @@ double DX(double **f, long i, long j)
 	
     
     if (i==1) {
-        prev_i = 1;
-        if(j<num_of_meshpoint_phi){prev_j=j+num_of_meshpoint_phi;}else{prev_j=j-num_of_meshpoint_phi;};
+	  prev_i = 1;
+	  if(j<=num_of_meshpoint_phi){prev_j=j+num_of_meshpoint_phi;}else{prev_j=j-num_of_meshpoint_phi;};
     }
     
     else {
-        prev_i = i-1;
-        prev_j = j;
+	  prev_i = i-1;
+	  prev_j = j;
     }
     
     
     if (i==num_of_meshpoint_theta) {
-        next_i = num_of_meshpoint_theta;
-        if(j<num_of_meshpoint_phi){next_j=j+num_of_meshpoint_phi;}else{next_j=j-num_of_meshpoint_phi;};
+	  next_i = num_of_meshpoint_theta;
+	  if(j<=num_of_meshpoint_phi){next_j=j+num_of_meshpoint_phi;}else{next_j=j-num_of_meshpoint_phi;};
     }
     
     
     else {
-        next_i = i+1;
-        next_j = j;}
+	  next_i = i+1;
+	  next_j = j;}
 	
 	return (f[next_i][next_j]-f[prev_i][prev_j])/(2*dtheta);
 }
@@ -356,25 +361,25 @@ double DXX(double **f, long i, long j)
     long prev_i,prev_j, next_i, next_j;
     
     if (i==1) {
-        prev_i = 1;
-        if(j<num_of_meshpoint_phi){prev_j=j+num_of_meshpoint_phi;}else{prev_j=j-num_of_meshpoint_phi;};
+	  prev_i = 1;
+	  if(j<=num_of_meshpoint_phi){prev_j=j+num_of_meshpoint_phi;}else{prev_j=j-num_of_meshpoint_phi;};
     }
     
     else {
-        prev_i = i-1;
-        prev_j = j;
+	  prev_i = i-1;
+	  prev_j = j;
     }
     
     
     if (i==num_of_meshpoint_theta) {
-        next_i = num_of_meshpoint_theta;
-        if(j<num_of_meshpoint_phi){next_j=j+num_of_meshpoint_phi;}else{next_j=j-num_of_meshpoint_phi;};
+	  next_i = num_of_meshpoint_theta;
+	  if(j<=num_of_meshpoint_phi){next_j=j+num_of_meshpoint_phi;}else{next_j=j-num_of_meshpoint_phi;};
     }
     
     
     else {
-        next_i = i+1;
-        next_j = j;}
+	  next_i = i+1;
+	  next_j = j;}
     
     //printf("Current (%ld,%ld),Next (%ld,%ld),Prev (%ld,%ld)\n",i,j,next_i,next_j,prev_i,prev_j);
 	
@@ -387,9 +392,11 @@ double DYY(double **f, long i, long j)
 {
 	long prev, next;
 	
-	prev = mod(j-1,2*num_of_meshpoint_phi);
-	next = mod(j+1,2*num_of_meshpoint_phi);
-	
+	//prev = mod(j-1,2*num_of_meshpoint_phi);
+	//next = mod(j+1,2*num_of_meshpoint_phi);
+	if(j==1) {prev=2*num_of_meshpoint_phi;} else{prev= j-1;};
+	if(j==2*num_of_meshpoint_phi) {next=1;} else{next= j+1;};
+
 	return (f[i][next]-2*f[i][j]+f[i][prev])/(dphi*dphi);
 }
 
@@ -423,7 +430,7 @@ void one_step()
 		rk2();
     	break;
   	case 3:
-        	rk4();
+	  	rk4();
     	break;
 	}
 }
@@ -579,8 +586,8 @@ void end()
 
 void write_hi(FILE *f_ou, long t)
 {
-	double phi_tot=0;
-	long m, i, j;
+	double phi_tot=0,utemp,ddtemp;
+	long m, i, j, it, jt,it1;
  	
 	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
@@ -589,8 +596,15 @@ void write_hi(FILE *f_ou, long t)
 	}
 	
 	//m = num_of_meshpoint_theta/2;
+
+	it=num_of_meshpoint_theta;
+	it1=(int)it*.5;
+	jt=num_of_meshpoint_phi;
+
+	utemp=phi[it][jt]*(phi[it][jt]*phi[it][jt]-1)/(epsilon*epsilon);
+	ddtemp=DD(phi,it,jt);
 	
-	fprintf(f_ou,"%.10f\t%.10f\n",t*DT,phi_tot);
+	fprintf(f_ou,"%.10f\t%.10f\t%.10f\t%.10f\t%.10f\t%.10f\n",t*DT,phi_tot,ddtemp,utemp,phi[it][jt],phi[it1][jt]);
 	
 	// Legend
 	
@@ -600,6 +614,27 @@ void write_hi(FILE *f_ou, long t)
 }
 
 /*******************************************************************/
+
+void export_coord()
+{
+	char f_na[32];
+	double x, y;
+	long i, j;
+
+	FILE *f_ou;
+
+	sprintf(f_na,"coord.dat");
+	f_ou = fopen(f_na,"w");
+	
+	for (i=1; i<=num_of_meshpoint_theta; i++){
+		for (j=1; j<=2*num_of_meshpoint_phi; j++){
+			x = (i-.5)*dtheta;
+			y = j*dphi;
+			fprintf(f_ou,"%.10f\t%.10f\n",x,y);
+		}
+	}
+	fclose(f_ou);
+}
 
 void export_conf(long t, long period)
 {
@@ -617,9 +652,9 @@ void export_conf(long t, long period)
 	
 	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			x = (i-.5)*dtheta;
-			y = j*dphi;
-			fprintf(f_ou,"%.10f\t%.10f\t%.10f\n",x,y,phi[i][j]);
+			//x = (i-.5)*dtheta;
+			//y = j*dphi;
+			fprintf(f_ou,"%.10f\n",phi[i][j]);
 		}
 	}
 	fclose(f_ou);
@@ -666,10 +701,10 @@ double ran2(long *idum)
     	else *idum = -(*idum);
     	idum2 = (*idum);
     	for (j=NTAB+7; j>=0; j--) {
-      		k = (*idum)/IQ1;
-      		*idum = IA1*(*idum-k*IQ1)-k*IR1;
-      		if (*idum < 0) *idum += IM1;
-      		if (j < NTAB) iv[j] = *idum;
+			k = (*idum)/IQ1;
+			*idum = IA1*(*idum-k*IQ1)-k*IR1;
+			if (*idum < 0) *idum += IM1;
+			if (j < NTAB) iv[j] = *idum;
     	}
     	iy = iv[0];
   	}
@@ -710,7 +745,7 @@ void debug()
 	f_ou = fopen("debug-phi.dat","w");
 	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			x = (i+1/2)*dtheta;
+			x = (i-.5)*dtheta;
 			y = j*dphi;
 			fprintf(f_ou,"%g %g %g\n",x,y,phi[i][j]);
 		}
@@ -722,7 +757,7 @@ void debug()
 	f_ou = fopen("debug-rhs1.dat","w");
 	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			x = (i+1/2)*dtheta;
+			x = (i-.5)*dtheta;
 			y = j*dphi;
 			fprintf(f_ou,"%g %g %g\n",x,y,k0[i][j]);
 		}
