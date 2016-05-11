@@ -24,6 +24,7 @@ long num_of_iteration;
 long method;
 
 double lagrange;
+double areasphere;
 double epsilon=0.1;
 double sigma;
 
@@ -44,6 +45,7 @@ double dphi;
 double DT;
 
 double get_area();
+double get_surface_area();
 double ran2(long *);
 
 double DD(double **, long, long);
@@ -219,9 +221,9 @@ void get_chemical()
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
 			u = phi[i][j]*(phi[i][j]*phi[i][j]-1)/(epsilon*epsilon);
 			mu[i][j] = sigma*(u-DD(phi,i,j));
-			lagrange += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*(u-DD(phi,i,j));
+			lagrange += 1/areasphere*dphi*dtheta*sin((i-.5)*dtheta)*(u-DD(phi,i,j));
 			//mu[i][j] = sigma*(-DD(phi,i,j));
-			//lagrange += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*(-DD(phi,i,j));
+			//lagrange += 1/areasphere*dphi*dtheta*sin((i-.5)*dtheta)*(-DD(phi,i,j));
 			//printf("(%2ld,%2ld) u: %12G phi: %12G Lagrange: %12G mu: %12G DD: %12G DXX: %12G DX: %12G DYY: %12G\n",i,j,u,phi[i][j],lagrange,mu[i][j],DD(phi,i,j),DXX(phi,i,j),DX(phi,i,j),DYY(phi,i,j));
 		}
 	}
@@ -254,6 +256,8 @@ void run()
 	f_hi = fopen("hi.dat","w");
 
 	export_coord();	
+
+	areasphere=get_surface_area();
 	
 	for (t=0; t<num_of_iteration; t++){
 		export_conf(t,export);
@@ -265,6 +269,22 @@ void run()
 	fclose(f_hi);
 }
 
+ double get_surface_area()
+{
+	double sarea;
+	long i, j;
+	double cthetam,sthetam,cphim,sphim;
+
+	sarea=0;
+
+	for (i=1; i<=num_of_meshpoint_theta; i++){
+		for (j=1; j<=2*num_of_meshpoint_phi; j++){
+			sarea += dphi*dtheta*sin((i-.5)*dtheta);
+		}
+	}
+	return sarea;
+}
+
  
  
  double get_area()
@@ -274,7 +294,7 @@ void run()
 	
 	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			area += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*(phi[i][j]+1)*.5;
+			area += 1/areasphere*dphi*dtheta*sin((i-.5)*dtheta)*(phi[i][j]+1)*.5;
 			//area += .5*dtheta*dphi*sin((i-.5)*dtheta)*(phi[i][j]+1);
 		}
 	}
@@ -591,7 +611,7 @@ void write_hi(FILE *f_ou, long t)
  	
 	for (i=1; i<=num_of_meshpoint_theta; i++){
 		for (j=1; j<=2*num_of_meshpoint_phi; j++){
-			phi_tot += .25/PI*dphi*dtheta*sin((i-.5)*dtheta)*phi[i][j];
+			phi_tot += 1/areasphere*dphi*dtheta*sin((i-.5)*dtheta)*phi[i][j];
 		}
 	}
 	
